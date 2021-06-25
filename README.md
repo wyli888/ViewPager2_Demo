@@ -8,7 +8,7 @@
 
 之前项目中 也用过这种UI页面 但是写的时候总是会出现内存泄漏 所以就研究了一下 viewPager2 
 
-#[https://square.github.io/leakcanary/getting_started/](内存泄漏检测工具)
+LeakCanary --> [内存泄漏检测工具](https://square.github.io/leakcanary/getting_started/)
 
 使用非常简单 
 
