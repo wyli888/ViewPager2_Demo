@@ -20,7 +20,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.e.ceshi.R;
 import com.e.ceshi.ui.BlankFragment;
+import com.e.ceshi.ui.DepthPageTransformer;
 import com.e.ceshi.ui.FragmentAdapter;
+import com.e.ceshi.ui.TabLayoutMediators;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -37,7 +39,6 @@ public class HomeFragment extends Fragment {
 
   // 用List 存放fragment 不推荐使用 用不好 导致内存泄漏
   private ArrayList<BlankFragment> fragments = new ArrayList<>();
-
 
 
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,10 +64,11 @@ public class HomeFragment extends Fragment {
     // 关闭预加载
     viewPager2.setOffscreenPageLimit(ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT);  // 可以不设置 因为默认是 -1 默认不进行预加载
     // 这个必须设置 不然仍然会启用预加载
-    ((RecyclerView)viewPager2.getChildAt(0)).getLayoutManager().setItemPrefetchEnabled(false);
+    ((RecyclerView) viewPager2.getChildAt(0)).getLayoutManager().setItemPrefetchEnabled(false);
     // 设置缓存数量，对应 RecyclerView 中的 mCachedViews，即屏幕外的视图数量
-    ((RecyclerView)viewPager2.getChildAt(0)).setItemViewCacheSize(0);
+    ((RecyclerView) viewPager2.getChildAt(0)).setItemViewCacheSize(0);
 
+    ((RecyclerView)viewPager2.getChildAt(0)).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
     // 第一种方法 (可能会内存泄漏)
     //FragmentAdapter adapter = new FragmentAdapter(this, fragments);
     //viewPager2.setAdapter(adapter);
@@ -85,12 +87,14 @@ public class HomeFragment extends Fragment {
       }
 
     });
+    //viewPager2.setPageTransformer(new DepthPageTransformer());
     // viewPager2 滑动监听
     viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
       @Override
       public void onPageSelected(int position) {
         super.onPageSelected(position);
 
+        Log.i("=======Tag========","==============" + position);
       }
     });
 
@@ -98,7 +102,16 @@ public class HomeFragment extends Fragment {
     // 一旦 我们通过 点击tabLayout时 如果两个tab距离过远  那么所有划过的tabLayout 都会创建和销毁BlankFragment 这显然不是我们想要的
 
     // tabLayout 和 viewPager 联动
-    new TabLayoutMediator(tabLayout, viewPager2,true,false, new TabLayoutMediator.TabConfigurationStrategy() {
+//    new TabLayoutMediator(tabLayout, viewPager2, true, true, new TabLayoutMediator.TabConfigurationStrategy() {
+//      @Override
+//      public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+//        tab.setText(tabTitles.get(position));
+//
+//      }
+//    }).attach();
+
+    // 这里我们将 google官方的代码copy下来做一下修改 点击tab是无动画 滑动时有动画 防止fragment 多次创建
+    new TabLayoutMediators(tabLayout, viewPager2, new TabLayoutMediators.TabConfigurationStrategy() {
       @Override
       public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
         tab.setText(tabTitles.get(position));
