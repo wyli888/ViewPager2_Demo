@@ -113,6 +113,7 @@ public class HomeFragment extends Fragment {
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
+        // 这个一定要设为false 否则点击tabLayout时 所有划过的 viewPager 会创建几个 fragment 大概是4个左右
         viewPager2.setCurrentItem(tab.getPosition(), false);
       }
 
